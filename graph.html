@@ -5,33 +5,63 @@ https://plot.ly/javascript/3d-line-plots/
   -->
 
   <head>
-  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="plotly.js"></script>
 
 <script>
-Plotly.d3.csv('https://raw.githubusercontent.com/minneapolis-edu/lorenz/master/points-0.100010-0.000000-0.000000.csv', function(err, rows){
-      function unpack(rows, key) {
+
+//var filename = "https://raw.githubusercontent.com/minneapolis-edu/lorenz/master/points-0.100000-0.000000-0.000000.csv";
+//var filename2 = "https://raw.githubusercontent.com/minneapolis-edu/lorenz/master/points-0.100010-0.000000-0.000000.csv";
+
+var filename = "points-0.100000-0.000000-0.000000.csv";
+var filename2 = "points-0.100010-0.000000-0.000000.csv";
+
+Plotly.d3.csv(filename, function(err, rows){
+
+        function unpack(rows, key) {
           return rows.map(function(row)
-          { return row[key]; }); }
-var x = unpack(rows , 'x');
-var y = unpack(rows , 'y');
-var z = unpack(rows , 'z');
+          { return row[key]; });
+        }
+
+      var x = unpack(rows , 'x');
+      var y = unpack(rows , 'y');
+      var z = unpack(rows , 'z');
 //var c = unpack(rows , 'color');
-Plotly.plot('graph', [{
-  type: 'scatter3d',
-  mode: 'lines',
-  x: x,
-  y: y,
-  z: z,
-  opacity: 1,
-  line: {
-    width: 6,
-  //  color: c,
-    reversescale: false
-  }
-}], {
+
+     //Gak
+
+     Plotly.d3.csv(filename2, function(err, moreRows) {
+
+       var x2 = unpack(moreRows , 'x');
+       var y2 = unpack(moreRows , 'y');
+       var z2 = unpack(moreRows , 'z');
+
+     var trace1 = {
+       type: 'scatter3d',
+       mode: 'lines',
+       x: x,
+       y: y,
+       z: z,
+       opacity: 1,
+       line: {
+         width: 0.1,
+        color: 'rgb(0, aa, aa)',
+         reversescale: false
+       }
+     };
+
+    var trace2 = { type:"scatter3d", mode:"lines", x: x2, y:y2, z:z2, line:{width:0.2, color:'rgb(255, 22, 22)'}};
+
+    var  data = [trace1, trace2];
+
+Plotly.newPlot('graph', data, {
   height: 640
 });
-});</script>
+});
+
+});
+
+
+</script>
 
 </head>
 <body>
