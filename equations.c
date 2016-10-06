@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-//TODO freeing memory?
+//this is not how you do string?? freeing memory? arguments helpful here :)!
 //todo chart plot library
 
 double P = 10;
@@ -8,8 +8,6 @@ double R = 28;
 double B = 8.0/3.0;
 double dt = 0.01;
 int its = 100;
-
-
 
 void writeFile(double x, double y , double z) {
 
@@ -23,7 +21,6 @@ void writeFile(double x, double y , double z) {
   for ( int t = 1 ; t < its ; t++) {
 
     //printf("%f", t);
-    printf("\n");
     //dt is 1 so
     double dx = P * (y - x);
     double dy = (x * (R - z) ) - y;
