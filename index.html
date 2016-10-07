@@ -4,6 +4,8 @@
 
   <title>Lorenz Attractor</title>
 
+  <!--  'Style' the things!  Smegging CSS. -->
+
   <style>
 
   body {
@@ -39,14 +41,15 @@
     width: 300px;
 
   }
+
+  a:link {
+    text-decoration: none;
+  }
   </style>
 
 </head>
 
 <body>
-
-<!--  Style the things!  Smegging CSS. -->
-
 
 <!-- Calculate Lorenz functions, draw as points
 
@@ -56,6 +59,7 @@ nd the TrackballControls - very cool! -->
 
 
   <div id="controls">
+    <P>Draw <a href="https://en.wikipedia.org/wiki/Lorenz_system">Lorenz Attractors</a> - an example of chaotic behavor - starting at the given X, Y, Z coordinates. Notice how lines starting at very similar points diverge. Line drawing stops after a couple of thousand points. Made with the excellent <a href="https://threejs.org/">Three.js</a>.</p>
     <form>
       <!--  table for layout, tsk tsk. -->
       <table><tr><td>
@@ -69,23 +73,25 @@ nd the TrackballControls - very cool! -->
       </td></tr>
     </table>
 
-    <p>Tip: a line starting at 0, 0, 0 won't go anywhere</p>
+    <p>Tip: 0, 0, 0 is the only stable, non-chaotic start point, that follows a predictable pattern. But it's not very exciting - it stays at 0, 0, 0.</p>
 
       <input id="newLineButton" type=button value="Add new line" onclick="addLine()"></input>
+      <span id="usermessages"></span>
       <input id="resetButton" type=button value="Remove all lines" onclick="removeAll()"></input>
 
     </form>
 
   </div>
 
-
+  <!-- Local version of three.js -->
   <!-- <script src="three.js-master/build/three.js"></script> -->
+  <!-- CDN version -->
   <script src="https://ajax.googleapis.com/ajax/libs/threejs/r76/three.min.js"></script>
 
+  <!-- Moving the camera around MAGIC  -->
   <script src="js/controls/TrackballControls.js"></script>
 
   <script>
-
 
 
   function updateSliderText() {
@@ -98,22 +104,33 @@ nd the TrackballControls - very cool! -->
 
   updateSliderText();
 
+  var MAXLINES = 15;
 
   function addLine() {
 
-    var x = document.getElementById('x').value * 1.0;   //Hack to convert the String values into numbers
-    var y = document.getElementById('y').value * 1.0;
-    var z = document.getElementById('z').value * 1.0;
+    if (pointSets.length < MAXLINES) {
 
-    var startPoints = [x, y ,z ];
+      document.getElementById('usermessages').innerText = "new line drawing";
 
-    pointSets.push(startPoints);
+      var x = document.getElementById('x').value * 1.0;   //Hack to convert the String values into numbers
+      var y = document.getElementById('y').value * 1.0;
+      var z = document.getElementById('z').value * 1.0;
 
-    var lineColorStr = document.getElementById('color').value.slice(1);   //This seems a bit too much work(?).value is a string. Material wants an number
-    var lineColorInt = parseInt(lineColorStr, 16);
-    var material = new THREE.SpriteMaterial( { color : lineColorInt })
+      var startPoints = [x, y, z];
 
-    materials.push(material);
+      pointSets.push(startPoints);
+
+      var lineColorStr = document.getElementById('color').value.slice(1);   //This seems a bit too much work(?).value is a string. Material wants an number
+      var lineColorInt = parseInt(lineColorStr, 16);
+      var material = new THREE.SpriteMaterial( { color : lineColorInt })
+
+      materials.push(material);
+
+      pointsRendered.push(0);
+
+    } else {
+      document.getElementById('usermessages').innerText = MAXLINES + " is the most you can add";
+    }
 
   }
 
@@ -123,6 +140,7 @@ nd the TrackballControls - very cool! -->
 
     materials = [];
     pointSets = [];
+    pointsRendered = [];
 
     for (var obj = scene.children.length - 1 ; obj >= 0 ; obj--) {
       scene.remove(scene.children[obj]);
@@ -165,6 +183,8 @@ nd the TrackballControls - very cool! -->
   //The origin is where the camera is. So move the camera out a bit so can see the objects.
   camera.position.z = 100;
 
+  //This is pretty much all you need to do, to be able to move the camera around.
+  //Need to update in the render loop too
   var controls = new THREE.TrackballControls(camera, renderer.domElement);
 
   //The points we'll display
@@ -180,29 +200,42 @@ nd the TrackballControls - very cool! -->
   var pointScale = 0.3   //Size of squares drawn for each point
 
   //And the lines drawn
+  //Start with two really similar points to observe chaotic behavior - lines don't follow each other closely at all.
   var pointSets = [ [1, 1, 1], [1, 1.0001, 1] ];   //The last location of the each line being drawn
   var materials = [ material, material2 ];
+  var pointsRendered = [ 0, 0 ];
 
 
+  var MAXPOINTS = 6000;
 
   function renderAll() {
 
     for (var p = 0 ; p < pointSets.length ; p++) {
 
-      var nextPoints = nextLorenzPoint(pointSets[p]);
-      pointSets[p] = nextPoints;
+      if ( ++pointsRendered[p] < MAXPOINTS ) {
 
-      var particle = new THREE.Sprite(materials[p]);
+        var nextPoints = nextLorenzPoint(pointSets[p]);
+        pointSets[p] = nextPoints;
 
-      particle.position.x = nextPoints[0];
-      particle.position.y = nextPoints[1];
-      particle.position.z = nextPoints[2];
+        //Count the number of points in this line. if more than MAXPOINTS then ignore.
+        var particle = new THREE.Sprite(materials[p]);
 
-      particle.scale.x = particle.scale.y = particle.scale.z = pointScale;
+        particle.position.x = nextPoints[0];
+        particle.position.y = nextPoints[1];
+        particle.position.z = nextPoints[2];
 
-      geometry.vertices.push(particle.position);
+        particle.scale.x = particle.scale.y = particle.scale.z = pointScale;
 
-      scene.add(particle);
+        geometry.vertices.push(particle.position);
+
+        scene.add(particle);
+
+      }
+      else if (pointsRendered[p] == MAXPOINTS) {
+        document.getElementById('usermessages').innerText = "Line " + p + " has " + MAXPOINTS + " points, stopped drawing.";
+        //todo remove this line (?)
+      }
+      //else, ignore this point. After a couple of thousand many points, you can't see new ones very well.
 
     }
 
