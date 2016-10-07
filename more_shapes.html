@@ -20,6 +20,16 @@
 
 <body>
 
+<!--  Style these things! -->
+
+
+<!-- Calculate Lorenz functions, draw as points
+
+With a lot of help from the ThreeJS Canvas Lines example, a
+nd the TrackballControls - very cool! -->
+
+
+
   <div>
     <form>
       <input id="x" type=range min="-5" max="5" step="0.001" onchange="updateSliderText()"><span id="x_val"></span>
@@ -37,20 +47,10 @@
 
 
   <script src="three.js-master/build/three.js"></script>
+  <script src="three.js-master/examples/js/controls/TrackballControls.js"></script>
+
   <script>
 
-  /*
-  Calculate Lorenz functions, draw point with lines between them
-
-  STYLE these inputs!
-  Prevent or warn about all 0s which doesn't do anything
-
-  Use mouse to move view around
-
-  //With a lot of help from the ThreeJS Canvas Lines example
-
-
-  */
 
 
   function updateSliderText() {
@@ -83,9 +83,8 @@
   }
 
 
-  function removeAll() {
 
-    //fixme - this stops current lines drawing but doesn't remove lines currently in scene.
+  function removeAll() {
 
     materials = [];
     pointSets = [];
@@ -130,6 +129,8 @@
 
   //The origin is where the camera is. So move the camera out a bit so can see the objects.
   camera.position.z = 100;
+
+  var controls = new THREE.TrackballControls(camera, renderer.domElement);
 
   //The points we'll display
   var geometry = new THREE.Geometry();  //superclass of other geometries
@@ -178,6 +179,8 @@
 
     requestAnimationFrame(render);
 
+    controls.update();
+
     renderAll();
 
     renderer.render( scene, camera );
@@ -186,6 +189,16 @@
 
 
   render();      /// GO!
+
+
+  window.addEventListener( 'resize' , onWindowResize, false);
+
+  //Admin stuff - resize on window resize
+  function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize( window.innerWidth, window.innerHeight);
+  }
 
 
 
