@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<style>
+
+body {
+  margin : 0;
+}
+canvas {
+  width: 100%;
+  height : 100%;
+}
+
+</style>
+
+</head>
+
+<body>
+
+  <script src="three.js-master/build/three.js"></script>
+  <script>
+
+  /*
+  Calculate Lorenz functions, draw point with lines between them
+
+  Able to add new point inside 3d box
+  Set colors ?
+  Set start point ?
+
+  Set P, B, R?
+
+  Use mouse to move view around
+
+  //With a lot of help from the ThreeJS Canvas Lines example
+
+
+  */
+
+
+  function nextLorenzPoint(points) {
+    var x = points[0];
+    var y = points[1];
+    var z = points[2];
+
+    var P = 10.0;
+    var R = 28.0;
+    var B = 8.0/3.0;
+    var dt = 0.01;
+
+    var newx = x + (  P * ( y - x )        * dt);   //it is possible that some of these brackets are not needed :)
+    var newy = y + ((( x * ( R - z )) - y ) * dt);
+    var newz = z + (( ( x*y ) - ( B*z ))    * dt);
+
+    return [ newx, newy, newz ];
+  }
+
+  //Scene setup
+  var scene = new THREE.Scene();
+  //Camera args:
+  //A Frustrum is a cone or pyramid with two vertical planes cutting through it.
+  // Represents the volume the camera sees.
+  //Tip on side so camera looks through first plane at far plane(?). Only stuff between the planes gets rendered.
+  //args:  vertical field of view ; aspect ratio (almost always width/heiht) ; near plane; far plane
+  var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+  //WebGL recommended renderer, others are for older browsers
+  var renderer = new THREE.WebGLRenderer();
+  renderer.setSize( window.innerWidth, window.innerHeight);
+  document.body.appendChild( renderer.domElement );    // Adds a canvas element, style section makes this the size of the browser window
+
+  //The origin is where the camera is. So move the camera out a bit so can see the objects.
+  camera.position.z = 100;
+
+  //The points we'll display
+  var geometry = new THREE.Geometry();  //superclass of other geometries
+
+  /* Config stuff */
+
+  // //Material
+  var material = new THREE.SpriteMaterial( { color: 0x00ffff } );
+  var material2 = new THREE.SpriteMaterial( { color: 0xffff00 } );
+  var material3 = new THREE.SpriteMaterial( { color: 0xff00ff } );
+  var material4 = new THREE.SpriteMaterial( { color: 0x00ff00 } );
+  var material4 = new THREE.SpriteMaterial( { color: 0x0000ff } );
+
+
+
+  var pointScale = 0.3
+
+  //And the lines drawn
+  var pointSets = [ [1, 1, 1], [2, 2, 2], [0.1, 0.2, 0.2], [3, 3, 3], [1, 1, 1.0001] ];   //The last location of the each line being drawn
+  var materials = [ material, material2, material3, material4 ];
+
+  function renderAll() {
+
+    for (var p = 0 ; p < pointSets.length ; p++) {
+
+      var nextPoints = nextLorenzPoint(pointSets[p]);
+      pointSets[p] = nextPoints;
+
+      var particle = new THREE.Sprite(materials[p]);
+
+      particle.position.x = nextPoints[0];
+      particle.position.y = nextPoints[1];
+      particle.position.z = nextPoints[2];
+
+      particle.scale.x = particle.scale.y = particle.scale.z = pointScale;
+
+      geometry.vertices.push(particle.position);
+
+      scene.add(particle);
+
+    }
+
+  }
+
+  // ... because need a render loop that draws the scene at 60fps
+
+  //This is called 60 times per second.
+
+  function render() {
+
+    requestAnimationFrame(render);
+
+
+    renderAll();
+
+    renderer.render( scene, camera );
+
+
+  }
+
+
+  render();
+
+
+
+  </script>
+
+</body>
+
+</html>

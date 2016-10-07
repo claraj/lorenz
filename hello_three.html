@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<style>
+body {
+  margin : 0;
+}
+canvas {
+  width: 100%;
+  height : 100%;
+}
+</style>
+
+</head>
+
+<body>
+
+  <script src="three.js-master/build/three.js"></script>
+  <script>
+//Needs 3x things: a scene, a camera, and a renderer (which renders the scene with the camera)
+
+  var scene = new THREE.Scene();
+  //Camera args:
+  //A Frustrum is a cone or pyramid with two vertical planes cutting through it.
+  // Represents the volume the camera sees.
+  //Tip on side so camera looks through first plane at far plane(?). Only stuff between the planes gets rendered.
+  //args:  vertical field of view ; aspect ratio (almost always width/heiht) ; near plane; far plane
+  var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+  //WebGL recommended renderer, others are for older browsers
+  var renderer = new THREE.WebGLRenderer();
+  renderer.setSize( window.innerWidth, window.innerHeight);
+  document.body.appendChild( renderer.domElement);    // Adds a canvas element, style section makes this the size of the browser window
+
+  //The points - shape of the object
+  var geometry = new THREE.BoxGeometry(1, 1, 1);
+  //Material for the cube. Can do more complex materials
+  var material = new THREE.MeshBasicMaterial( { color: 0x00ffff } );
+  //A mesh takes a geomery and applies a material to it
+  var cube = new THREE.Mesh( geometry, material );
+  //And add tp the scene, by default at the origin (0, 0, 0);
+  scene.add(cube);
+
+  //The origin is where the camera is. So move the camera out a bit so can see the cube.
+  //At this point, nothing to see....
+  camera.position.z = 5;
+
+
+  // ... because need a render loop that draws the scene at 60fps
+
+  //This is called 60 times per second. 
+  function render() {
+
+    requestAnimationFrame(render);
+
+    //Without this, the cube is not moving.
+    cube.rotation.x += 0.01;
+    cube.rotation.y += 0.01;
+
+
+    renderer.render( scene, camera );
+
+
+  }
+
+  render();
+
+  //And now there's a cube.
+
+
+  </script>
+
+</body>
+
+</html>
