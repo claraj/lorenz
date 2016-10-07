@@ -8,19 +8,44 @@
 
   body {
     margin : 0;
+    background-color: #eeeeee
   }
   canvas {
     width: 100%;
     height : 100%;
   }
 
+  p {
+    margin : 3px;
+  }
+  input {
+    margin : 5px;
+  }
+
+  #controls, input {
+    font-family: monospace;
+  }
+
+  #resetButton {
+    float : right;
+  }
+
+  table {
+    table-layout: fixed;
+    width: 100%;
+  }
+
+  tr {
+    width: 300px;
+
+  }
   </style>
 
 </head>
 
 <body>
 
-<!--  Style these things! -->
+<!--  Style the things!  Smegging CSS. -->
 
 
 <!-- Calculate Lorenz functions, draw as points
@@ -30,18 +55,24 @@ nd the TrackballControls - very cool! -->
 
 
 
-  <div>
+  <div id="controls">
     <form>
-      <input id="x" type=range min="-5" max="5" step="0.001" onchange="updateSliderText()"><span id="x_val"></span>
-      <input id="y" type=range min="-5" max="5" step="0.001" onchange="updateSliderText()"><span id="y_val"></span>
-      <input id="z" type=range min="-5" max="5" step="0.001" onchange="updateSliderText()"><span id="z_val"></span>
+      <!--  table for layout, tsk tsk. -->
+      <table><tr><td>
+        <input id="x" class="slider" type=range min="-5" max="5" step="0.001" oninput="updateSliderText()"><span id="x_val" class="slider_text"></span>
+      </td><td>
+      <input id="y" class="slider" type=range min="-5" max="5" step="0.001" oninput="updateSliderText()"><span id="y_val" class="slider_text"></span>
+    </td><td>
+      <input id="z" class="slider" type=range min="-5" max="5" step="0.001" oninput="updateSliderText()"><span id="z_val" class="slider_text"></span>
+    </td><td>
       <input id="color" type=color value="#00ff00">Color</input>
+    </td></tr></table>
+
+    <p>Tip: a line starting at 0, 0, 0 won't go anywhere</p>
 
       <input id="newLineButton" type=button value="Add new line" onclick="addLine()"></input>
       <input id="resetButton" type=button value="Remove all lines" onclick="removeAll()"></input>
-      <span>Tip: a line starting at 0, 0, 0 won't go anywhere</span>
     </form>
-
 
   </div>
 
