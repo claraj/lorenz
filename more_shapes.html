@@ -2,21 +2,39 @@
 <html>
 <head>
 
-<style>
+  <title>Lorenz Attractor</title>
 
-body {
-  margin : 0;
-}
-canvas {
-  width: 100%;
-  height : 100%;
-}
+  <style>
 
-</style>
+  body {
+    margin : 0;
+  }
+  canvas {
+    width: 100%;
+    height : 100%;
+  }
+
+  </style>
 
 </head>
 
 <body>
+
+  <div>
+    <form>
+      <input id="x" type=range min="-5" max="5" step="0.001" onchange="updateSliderText()"><span id="x_val"></span>
+      <input id="y" type=range min="-5" max="5" step="0.001" onchange="updateSliderText()"><span id="y_val"></span>
+      <input id="z" type=range min="-5" max="5" step="0.001" onchange="updateSliderText()"><span id="z_val"></span>
+      <input id="color" type=color value="#00ff00">Color</input>
+
+      <input id="newLineButton" type=button value="Add new line" onclick="addLine()"></input>
+      <input id="resetButton" type=button value="Remove all lines" onclick="removeAll()"></input>
+      <span>Tip: a line starting at 0, 0, 0 won't go anywhere</span>
+    </form>
+
+
+  </div>
+
 
   <script src="three.js-master/build/three.js"></script>
   <script>
@@ -24,11 +42,8 @@ canvas {
   /*
   Calculate Lorenz functions, draw point with lines between them
 
-  Able to add new point inside 3d box
-  Set colors ?
-  Set start point ?
-
-  Set P, B, R?
+  STYLE these inputs!
+  Prevent or warn about all 0s which doesn't do anything
 
   Use mouse to move view around
 
@@ -36,6 +51,50 @@ canvas {
 
 
   */
+
+
+  function updateSliderText() {
+
+    document.getElementById("x_val").innerText= "x = " + document.getElementById('x').value;
+    document.getElementById("y_val").innerText= "y = " + document.getElementById('y').value;
+    document.getElementById("z_val").innerText= "z = " + document.getElementById('z').value;
+
+  }
+
+  updateSliderText();
+
+
+  function addLine() {
+
+    var x = document.getElementById('x').value * 1.0;   //Hack to convert the String values into numbers
+    var y = document.getElementById('y').value * 1.0;
+    var z = document.getElementById('z').value * 1.0;
+
+    var startPoints = [x, y ,z ];
+
+    pointSets.push(startPoints);
+
+    var lineColorStr = document.getElementById('color').value.slice(1);   //This seems a bit too much work(?).value is a string. Material wants an number
+    var lineColorInt = parseInt(lineColorStr, 16);
+    var material = new THREE.SpriteMaterial( { color : lineColorInt })
+
+    materials.push(material);
+
+  }
+
+
+  function removeAll() {
+
+    //fixme - this stops current lines drawing but doesn't remove lines currently in scene.
+
+    materials = [];
+    pointSets = [];
+
+    for (var obj = scene.children.length - 1 ; obj >= 0 ; obj--) {
+      scene.remove(scene.children[obj]);
+    }
+
+  }
 
 
   function nextLorenzPoint(points) {
@@ -77,20 +136,18 @@ canvas {
 
   /* Config stuff */
 
-  // //Material
+  // //Material, two to start with
   var material = new THREE.SpriteMaterial( { color: 0x00ffff } );
-  var material2 = new THREE.SpriteMaterial( { color: 0xffff00 } );
-  var material3 = new THREE.SpriteMaterial( { color: 0xff00ff } );
-  var material4 = new THREE.SpriteMaterial( { color: 0x00ff00 } );
-  var material4 = new THREE.SpriteMaterial( { color: 0x0000ff } );
+  var material2 = new THREE.SpriteMaterial( { color: 0xff00ff } );
 
 
-
-  var pointScale = 0.3
+  var pointScale = 0.3   //Size of squares drawn for each point
 
   //And the lines drawn
-  var pointSets = [ [1, 1, 1], [2, 2, 2], [0.1, 0.2, 0.2], [3, 3, 3], [1, 1, 1.0001] ];   //The last location of the each line being drawn
-  var materials = [ material, material2, material3, material4 ];
+  var pointSets = [ [1, 1, 1], [1, 1.0001, 1] ];   //The last location of the each line being drawn
+  var materials = [ material, material2 ];
+
+
 
   function renderAll() {
 
@@ -116,23 +173,19 @@ canvas {
   }
 
   // ... because need a render loop that draws the scene at 60fps
-
   //This is called 60 times per second.
-
   function render() {
 
     requestAnimationFrame(render);
-
 
     renderAll();
 
     renderer.render( scene, camera );
 
-
   }
 
 
-  render();
+  render();      /// GO!
 
 
 
