@@ -8,4 +8,4 @@ Running code locally - serve from a file server and needs a local copy of Ploty.
 
 python -m SimpleHTTPServer 
 
-<img src="/blob/master/examplechart.png?raw=true">
+<img src="https://github.com/minneapolis-edu/lorenz/blob/master/examplechart.png?raw=true">
